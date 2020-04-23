@@ -29,16 +29,77 @@ namespace ToDo.Controllers
             _userManager = userManager;
         }
         // GET: ToDoItems
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string filterButton)
         {
             var user = await GetCurrentUserAsync();
+
+            //var items = await _context.ToDoItem
+            //  .Where(ti => ti.ApplicationUserId == user.Id)
+            //  .Include(ti => ti.ToDoStatus); 
+     
+
+            //switch (filterButton)
+            //{
+
+            //    case "To Do":
+
+            //   items = items.Where(ti => ti.ToDoStatusId == 1).ToListAsync(); 
+         
+            //        break; 
+
+            //     case "Progress":
+           
+            //   items =items.Where(ti => ti.ToDoStatusId == 2); 
+            
+            //        break; 
+
+
+            //}
+            //return View(items).ToListAsync(); 
+
+            if(filterButton == "To Do")
+            {
+                var items = await _context.ToDoItem
+          .Where(ti => ti.ApplicationUserId == user.Id)
+          .Where(ti => ti.ToDoStatusId == 1)
+          .Include(ti => ti.ToDoStatus)
+          .ToListAsync();
+
+
+                return View(items);
+            }
+            else if(filterButton == "Progress")
+            {
+                var items = await _context.ToDoItem
+          .Where(ti => ti.ApplicationUserId == user.Id)
+          .Where(ti => ti.ToDoStatusId == 2)
+          .Include(ti => ti.ToDoStatus)
+          .ToListAsync();
+
+                return View(items);
+            } else if(filterButton == "Done")
+            {
+                var items = await _context.ToDoItem
+          .Where(ti => ti.ApplicationUserId == user.Id)
+            .Where(ti => ti.ToDoStatusId == 3)
+          .Include(ti => ti.ToDoStatus)
+          .ToListAsync();
+
+                return View(items);
+            }
+            else
+            {
+
             var items = await _context.ToDoItem
                 .Where(ti => ti.ApplicationUserId == user.Id)
                 .Include(ti => ti.ToDoStatus)
-                .ToListAsync(); 
+                .ToListAsync();
+
+                return View(items);
+            }
 
 
-            return View(items);
+         
         }
 
 
@@ -153,7 +214,8 @@ namespace ToDo.Controllers
         // GET: ToDoItems/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
-            var item = await _context.ToDoItem.FirstOrDefaultAsync(i => i.Id == id); 
+            var item = await _context.ToDoItem.Include(i => i.ToDoStatus).FirstOrDefaultAsync(i => i.Id == id); 
+               
             return View(item);
         }
 
